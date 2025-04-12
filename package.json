@@ -1,0 +1,114 @@
+{
+  "name": "inventory-tracker",
+  "productName": "OTAO TECHHaven",
+  "version": "1.0.0",
+  "main": "main.js",
+  "description": "Developed by TIMON OWUOR",
+  "start": "electron .",
+  "author": "TIMON OWUOR",
+  "license": "ISC",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "electron-packager . --electron-version=25.0.0",
+    "dist": "electron-builder",
+    "start": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make"
+  },
+  "build": {
+    "appId": "com.OTAO.TECHHaven",
+    "files": [
+      "dist/**/*",
+      "resources/**/*",
+      "server.exe",
+      "Lander.html",
+      "static/css/lander.css",
+      "static/css/analytics.css",
+      "static/css/dash.css",
+      "static/css/inventory-view.css",
+      "static/css/styles.css",
+      "static/css/User.css",
+      "static/js/analytics.js",
+      "static/js/app.js",
+      "static/js/dash.js",
+      "static/js/restock.js",
+      "static/js/User.js",
+      "Analytics.html",
+      "dash.html",
+      "index.html",
+      "Inventory-view.html",
+      "Regs.html",
+      "User.html",
+      "routes/FaultyItems.js",
+      "routes/Items.js",
+      "routes/Login.js",
+      "routes/lowStock.js",
+      "routes/Register.js",
+      "routes/restock.js",
+      "models/Faulty.js",
+      "models/Item.js",
+      "models/SoldItem.js",
+      "models/User.js",
+      "models/userr.js",
+      "main.js",
+      "preload.js"
+    ],
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "asar": {
+      "smartUnpack": false,
+      "ordering": "file-ordering.txt"
+    },
+    "extraResources": [
+      {
+        "from": "server.exe",
+        "to": "server.exe",
+        "filter": [
+          "server.exe"
+        ]
+      },
+      {
+        "from": "libs/ffmpeg.dll",
+        "to": "./ffmpeg.dll"
+      }
+    ]
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.20.3",
+    "chart.js": "^4.4.6",
+    "cors": "^2.8.5",
+    "electron-squirrel-startup": "^1.0.1",
+    "exceljs": "^4.4.0",
+    "express": "^4.21.1",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.8.1",
+    "sweetalert2": "^11.6.13",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@electron-forge/cli": "^7.6.0",
+    "@electron-forge/maker-deb": "^7.6.0",
+    "@electron-forge/maker-rpm": "^7.6.0",
+    "@electron-forge/maker-squirrel": "^7.6.0",
+    "@electron-forge/maker-zip": "^7.6.0",
+    "@electron-forge/plugin-auto-unpack-natives": "^7.6.0",
+    "@electron-forge/plugin-fuses": "^7.6.0",
+    "@electron/fuses": "^1.8.0",
+    "electron": "^25.0.0",
+    "electron-packager": "^17.1.2"
+  }, 
+"pkg": {
+  "scripts": [
+    "server.js"
+  ],
+  "assets": [
+    "node_modules/bcrypt/lib/binding/napi-v3/bcrypt_lib.node"
+  ]
+}
+}

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register</title>
+  <link rel="stylesheet" href="static/css/User.css">
+</head>
+<body>
+  <div class="container">
+  <h2>Register</h2>
+  <form id="registerForm">
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username" required>
+
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" required>
+
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password" required>
+    <small>Password must be at least 8 characters, include uppercase and lowercase letters, a number, and a special character.</small>
+
+
+    <button type="submit">Register</button>
+  </form>
+  <p>Don't have an account? <a href="User.html">Login Instead</a></p>
+</div>
+<script>
+  const form = document.getElementById('registerForm');
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  
+  const username = document.getElementById('username').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value.trim();
+
+  // Validate inputs before sending the request
+  if (!username || !email || !password) {
+    alert('All fields are required.');
+    return;
+  }
+
+  // Optional: Add simple email validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    alert('Please enter a valid email address.');
+    return;
+  }
+
+  const submitButton = form.querySelector('button[type="submit"]');
+  submitButton.disabled = true; // Prevent duplicate submissions
+  submitButton.textContent = 'Registering...';
+
+  try {
+    const response = await fetch('http://localhost:3000/api/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, email, password }),
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+      alert(data.message);
+      window.location.href = 'User.html'; // Redirect to login or user dashboard
+    } else {
+      alert(data.error || 'Registration failed.');
+    }
+  } catch (error) {
+    console.error('Error registering user:', error);
+    alert('An error occurred while registering. Please try again.');
+  } finally {
+    // Re-enable the button after the operation
+    submitButton.disabled = false;
+    submitButton.textContent = 'Register';
+  }
+});
+
+</script>
+
+</body>
+</html>
