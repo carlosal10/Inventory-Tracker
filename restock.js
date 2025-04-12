@@ -1,82 +1,139 @@
-const express = require("express");
-const Item = require("../models/Item");  // Item schema
-const router = express.Router();
+document.addEventListener("DOMContentLoaded", function () {
+  const restockBtn = document.getElementById('restock-btn');
+  const restockModal = document.getElementById('restock-modal');
+  const closeBtn = document.getElementById('close-btn');
+  const restockForm = document.getElementById('restock-form');
+  const itemSelect = document.getElementById('item-select');
+  const formMessage = document.getElementById('formMessage');
+  const loader = document.getElementById("loader");
 
-// =======================
-//  GET: Notifications (Low & Out of Stock)
-// =======================
-router.get("/", async (req, res) => {
-  try {
-    // Fetch out-of-stock items (quantity <= 0)
-    const outOfStockItems = await Item.find({ quantity: { $lte: 0 } });
-
-    // Fetch low-stock items (quantity > 0 but <= 5)
-    const lowStockItems = await Item.find({ quantity: { $gt: 0, $lte: 5 } });
-
-    // Return both arrays in the response
-    res.status(200).json({
-      lowStockItems,
-      outOfStockItems
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Error fetching stock notifications",
-      error
+  // Show Restock Modal (if triggered by button)
+  if (restockBtn) {
+    restockBtn.addEventListener("click", function () {
+      openRestockModal();
     });
   }
-});
 
-// =======================
-//  POST: Restock Item
-// =======================
-router.post("/", async (req, res) => {
-  const { itemId, quantity } = req.body;
+  // Close Modal
+  closeBtn.addEventListener("click", function () {
+    restockModal.style.display = "none";
+  });
 
-  try {
-    // Find the item by ID
-    const item = await Item.findById(itemId);
-    if (!item) {
-      return res.status(404).json({
-        success: false,
-        message: "Item not found"
+  // Close Modal when clicking outside the content
+  window.addEventListener("click", function (event) {
+    if (event.target === restockModal) {
+      restockModal.style.display = "none";
+    }
+  });
+
+  // Handle Restock Form Submission
+  restockForm.onsubmit = async function (e) {
+    e.preventDefault();
+
+    // Show loading spinner
+    loader.style.display = "block";
+
+    const formData = new FormData(restockForm);  // Get form data
+    const itemId = formData.get("itemId");
+    const quantity = formData.get("quantity");
+
+    try {
+      const response = await fetch("http://localhost:3000/api/restock-item", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ itemId, quantity })
       });
+
+      const result = await response.json();
+      loader.style.display = "none";  // Hide spinner after response
+
+      if (result.success) {
+        formMessage.innerHTML = "✅ Item successfully restocked!";
+        fetchNotifications();  // Refresh notifications to reflect changes
+        setTimeout(() => {
+          restockModal.style.display = "none";  // Close modal after restock
+        }, 1500);
+      } else {
+        formMessage.innerHTML = `❌ ${result.message}`;
+      }
+    } catch (error) {
+      loader.style.display = "none";
+      formMessage.innerHTML = "❌ Error restocking item!";
+      console.error("Restock error:", error);
     }
+  };
 
-    // Increment the item quantity
-    item.quantity += parseInt(quantity, 10);
-    await item.save();
+  // Function to open the Restock Modal and populate items
+  function openRestockModal() {
+    const modal = document.getElementById("restock-modal");
+    const itemSelect = document.getElementById("item-select");
 
-    // Return success response
-    res.json({
-      success: true,
-      message: `${item.name} restocked by ${quantity} units.`,
-      updatedItem: item
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to restock item",
-      error
-    });
-  }
+    // Clear previous options
+    itemSelect.innerHTML = "";
+
+    // Fetch item details and populate the select box
+    fetch("http://localhost:3000/api/items")  // Fetch all items from backend
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(items => {
+        items.forEach(item => {
+          const option = document.createElement("option");
+          option.value = item._id;
+          option.textContent = item.name;
+          itemSelect.appendChild(option);
+        });
+      })
+      .catch(error => {
+        console.error("Error fetching items:", error);
+        formMessage.innerHTML = `❌ Error fetching items: ${error.message}`;
+      });
+
+
+  modal.style.display = "block";  // Show modal
+}
 });
 
-// =======================
-//  GET: Restock Modal (Fetch Items)
-// =======================
-router.get("/api/items", async (req, res) => {
-  try {
-    const items = await Item.find();  // Fetch all items from the database
-    if (items.length === 0) {
-      return res.status(404).json({ success: false, message: "No items found" });
+// Restock Item Using SweetAlert
+function restockItem(itemId) {
+  Swal.fire({
+    title: "Restock Item",
+    input: "number",
+    inputLabel: "Enter quantity to restock",
+    inputAttributes: {
+      min: 1,
+    },
+    showCancelButton: true,
+    confirmButtonText: "Restock",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      const quantity = result.value;
+
+      fetch("http://localhost:3000/api/restock-item", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ itemId, quantity }),
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            Swal.fire("Success!", data.message, "success");
+            fetchNotifications();  // Refresh notifications after restocking
+          } else {
+            Swal.fire("Error", data.message, "error");
+          }
+        })
+        .catch(error => {
+          Swal.fire("Error", "Failed to restock item.", "error");
+          console.error("Restock error:", error);
+        });
     }
-    res.json(items);  // Send items as JSON response
-  } catch (error) {
-    res.status(500).json({ success: false, message: "Error fetching items", error: error.message });
-  }
-});
-
-
-
-module.exports = router;
+  });
+}
