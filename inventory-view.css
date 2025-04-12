@@ -1,0 +1,179 @@
+/* General body styling */
+body {
+  font-family: 'Times New Roman', Times, serif;
+  background: #0a0a0a;
+  color: #ffffff;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Button Styling */
+button {
+  background-color: #008cff;
+  color: white;
+  border: 2px solid #005f8b;
+  padding: 12px 24px;
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 0 15px rgba(0, 140, 255, 0.5);
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  background-color: #005f8b;
+  box-shadow: 0 0 25px rgba(0, 140, 255, 0.7);
+  transform: scale(1.05);
+}
+
+/* Section Styling */
+section {
+  width: 80%;
+  margin: 40px 0;
+  position: relative;
+}
+
+/* Glowing text effects */
+h2 {
+  color: #00e6ff;
+  text-transform: uppercase;
+  font-size: 2em;
+  letter-spacing: 2px;
+  text-shadow: 0 0 1px #00e6ff, 0 0 3px #00e6ff, 0 0 6px #00e6ff;
+  animation: glow 5s infinite alternate;
+}
+
+@keyframes glow {
+  0% {
+    text-shadow: 0 0 1px #00e6ff, 0 0 2px #00e6ff, 0 0 4px #00e6ff, 0 0 6px #00e6ff;
+  }
+  100% {
+    text-shadow: 0 0 5pxrgb(0, 60, 255), 0 0 10pxrgb(0, 47, 255), 0 0 15pxrgb(0, 60, 255), 0 0 20pxrgb(0, 60, 255);
+  }
+}
+
+/* Table Styling */
+.table-container {
+  margin-top: 20px;
+  overflow-x: auto;
+  background-color: rgba(0, 0, 0, 0.7);
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 0 30px rgba(0, 140, 255, 0.6);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  color: #fff;
+  font-size: 16px;
+}
+
+th, td {
+  padding: 12px;
+  text-align: left;
+}
+
+th {
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+th:hover {
+  background-color: #008cff;
+  color: #fff;
+  box-shadow: 0 0 10px rgba(0, 140, 255, 0.7);
+}
+
+td {
+  background-color: #222;
+  border-bottom: 1px solid #444;
+}
+
+/* Input fields */
+input[type="text"], select {
+  background-color: #333;
+  border: 1px solid #00e6ff;
+  color: white;
+  padding: 8px;
+  font-size: 16px;
+  border-radius: 8px;
+  width: 250px;
+  transition: background-color 0.3s ease, border 0.3s ease;
+}
+
+input[type="text"]:focus, select:focus {
+  background-color: #1a1a1a;
+  border: 1px solid #008cff;
+  outline: none;
+}
+
+/* Pagination Styling */
+#pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+#pagination button {
+  background-color: #008cff;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  font-size: 14px;
+  border-radius: 5px;
+  margin: 0 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+#pagination button:hover {
+  background-color: #005f8b;
+  box-shadow: 0 0 10px rgba(0, 140, 255, 0.7);
+}
+
+/* Floating effect for table rows */
+tbody tr {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+/* Holographic glow effect on hover */
+table td:hover {
+  box-shadow: 0 0 20px rgba(0, 140, 255, 0.7);
+  transform: scale(1.05);
+}
+
+/* Export Button Styling */
+#export-items-btn, #export-sold-btn {
+  background-color: #00e6ff;
+  border: none;
+  padding: 12px 24px;
+  color: #000;
+  font-size: 16px;
+  border-radius: 8px;
+  box-shadow: 0 0 15px rgba(0, 140, 255, 0.5);
+  transition: all 0.3s ease;
+}
+
+#export-items-btn:hover, #export-sold-btn:hover {
+  background-color: #008cff;
+  box-shadow: 0 0 25px rgba(0, 140, 255, 0.7);
+  transform: scale(1.05);
+}
