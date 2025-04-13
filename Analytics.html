@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sales Analytics</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+   
+/* General body styling */
+body {
+  font-family: 'Arial', sans-serif;
+  background: #0a0a0a;
+  color: #ffffff;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Header Styling */
+header {
+  width: 100%;
+  background: #1a1a1a;
+  padding: 2px;
+  text-align: center;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  }
+
+h1 {
+  color: #00e6ff;
+  font-size: 2.5em;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  animation: glow 1.5s infinite alternate;
+}
+
+h2{
+  color: #00e6ff;
+  font-size: 1em;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+ 
+ 
+}
+
+
+button {
+  background-color: #008cff;
+  color: white;
+  border: 2px solid #005f8b;
+  padding: 12px 24px;
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  margin-left: 60%;
+}
+
+button:hover {
+  background-color: #005f8b;
+  box-shadow: 0 0 25px rgba(0, 140, 255, 0.7);
+  transform: scale(1.05);
+}
+
+/* Container for the chart rows */
+.container {
+  width: 90%;
+  margin-top: 40px;
+}
+
+.row {
+  display: flex;
+  flex-direction:row;
+  justify-content: space-between;
+  margin-bottom: 40px;
+  gap: 20px;
+}
+
+/* Chart Wrapper Styling */
+.chart-wrapper {
+  width: 48%;
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 20px;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  margin-bottom: 20px;
+  height: 48%;
+}
+
+.chart-wrapper:hover {
+  box-shadow: 0 0 40px rgba(0, 140, 255, 1);
+}
+
+/* Chart Title Styling */
+.chart-wrapper h2 {
+  color: #00e6ff;
+  font-size: 1.5em;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 20px;
+  animation: glow 1.5s infinite alternate;
+}
+
+/* Canvas Styling for charts */
+canvas {
+  width: 100% !important;
+  height: auto !important;
+  border-radius: 10px;
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+  .chart-wrapper {
+    width: 100%;
+  }
+
+  .row {
+    flex-direction: row;
+    
+  }
+
+  /* Adjust margins for better spacing */
+  .chart-wrapper {
+    margin-bottom: 30px;
+  }
+}
+
+
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Sales Analytics Dashboard</h1>
+    <button type="button" onclick="window.location.href='dash.html'">Dashboard</button>
+
+  </header>
+
+  <div class="container">
+    <div class="row">
+      <div class="chart-wrapper">
+        <h2>Profit & Loss per Category</h2>
+        <canvas id="profitLossBarChart"></canvas>
+      </div>
+
+      <div class="chart-wrapper">
+        <h2>Sales Trends</h2>
+        <canvas id="salesTrendsLineChart"></canvas>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="chart-wrapper">
+        <h2>Profit Margin per Category</h2>
+        <canvas id="profitMarginLineChart"></canvas>
+      </div>
+
+      <div class="chart-wrapper">
+        <h2>Total Profit/Loss Share</h2>
+        <canvas id="itemProfitPieChart"></canvas>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="chart-wrapper">
+        <h2>Units Sold per Category</h2>
+        <canvas id="unitsSoldStackedBarChart"></canvas>
+      </div>
+
+      <div class="chart-wrapper">
+        <h2>Revenue Breakdown per Category</h2>
+        <canvas id="revenueDoughnutChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    fetch('http://localhost:3000/api/sold-items')
+      .then(response => response.json())
+      .then(data => {
+        // Group data by category
+        const categoryData = {};
+        data.forEach(item => {
+          if (!categoryData[item.category]) {
+            categoryData[item.category] = {
+              quantity: 0,
+              revenue: 0,
+              profitOrLoss: 0
+            };
+          }
+          categoryData[item.category].quantity += item.quantity;
+          categoryData[item.category].revenue += item.quantity * item.soldPrice;
+          categoryData[item.category].profitOrLoss += item.profitOrLoss;
+        });
+
+        // Extract aggregated data
+        const categories = Object.keys(categoryData);
+        const totalSold = categories.map(category => categoryData[category].quantity);
+        const totalRevenue = categories.map(category => categoryData[category].revenue);
+        const totalProfit = categories.map(category => categoryData[category].profitOrLoss);
+
+        // Profit & Loss per Category (Bar Chart)
+        const profitLossCtx = document.getElementById('profitLossBarChart').getContext('2d');
+        new Chart(profitLossCtx, {
+          type: 'bar',
+          data: {
+            labels: categories,
+            datasets: [{
+              label: 'Profit/Loss per Category',
+              data: totalProfit,
+              backgroundColor: totalProfit.map(p => p >= 0 ? 'rgba(75, 192, 192, 0.2)' : 'rgba(255, 99, 132, 0.2)'),
+              borderColor: totalProfit.map(p => p >= 0 ? 'rgba(75, 192, 192, 1)' : 'rgba(255, 99, 132, 1)'),
+              borderWidth: 1
+            }]
+          },
+          options: {
+            scales: {
+              y: { beginAtZero: true, title: { display: true, text: 'Amount ($)' } }
+            }
+          }
+        });
+
+        // Sales Trends (Line Chart)
+        const salesTrendsCtx = document.getElementById('salesTrendsLineChart').getContext('2d');
+        new Chart(salesTrendsCtx, {
+          type: 'line',
+          data: {
+            labels: categories,
+            datasets: [{
+              label: 'Sales Quantity per Category',
+              data: totalSold,
+              borderColor: 'rgba(75, 192, 192, 1)',
+              tension: 0.1
+            }]
+          },
+          options: {
+            scales: {
+              y: { title: { display: true, text: 'Sales Quantity' } }
+            }
+          }
+        });
+
+        // Profit Margin per Category (Line Chart)
+        const profitMarginCtx = document.getElementById('profitMarginLineChart').getContext('2d');
+        new Chart(profitMarginCtx, {
+          type: 'line',
+          data: {
+            labels: categories,
+            datasets: [{
+              label: 'Profit Margin (%)',
+              data: totalProfit.map((profit, i) => (totalRevenue[i] ? (profit / totalRevenue[i]) * 100 : 0)),
+              borderColor: 'rgba(75, 192, 192, 1)',
+              tension: 0.1
+            }]
+          },
+          options: {
+            scales: {
+              y: { title: { display: true, text: 'Profit Margin (%)' } }
+            }
+          }
+        });
+
+        // Total Profit/Loss Share (Pie Chart)
+        const itemProfitCtx = document.getElementById('itemProfitPieChart').getContext('2d');
+        new Chart(itemProfitCtx, {
+          type: 'pie',
+          data: {
+            labels: categories,
+            datasets: [{
+              data: totalProfit,
+              backgroundColor: ['#4bc0c0', '#ff6384', '#36a2eb', '#ffcd56', '#c9cbcf']
+            }]
+          }
+        });
+
+        // Units Sold per Category (Stacked Bar Chart)
+        const unitsSoldCtx = document.getElementById('unitsSoldStackedBarChart').getContext('2d');
+        new Chart(unitsSoldCtx, {
+          type: 'bar',
+          data: {
+            labels: categories,
+            datasets: [{
+              label: 'Units Sold',
+              data: totalSold,
+              backgroundColor: '#4bc0c0'
+            }]
+          },
+          options: {
+            scales: {
+              y: { title: { display: true, text: 'Units Sold' } }
+            }
+          }
+        });
+
+        // Revenue Breakdown per Category (Doughnut Chart)
+        const revenueCtx = document.getElementById('revenueDoughnutChart').getContext('2d');
+        new Chart(revenueCtx, {
+          type: 'doughnut',
+          data: {
+            labels: categories,
+            datasets: [{
+              data: totalRevenue,
+              backgroundColor: ['#4bc0c0', '#ff6384', '#36a2eb', '#ffcd56', '#c9cbcf']
+            }]
+          }
+        });
+      })
+      .catch(error => console.error('Error fetching data:', error));
+
+      
+  </script>
+</body>
+</html>
