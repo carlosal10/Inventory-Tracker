@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inventory Tracker</title>
+  <link rel="stylesheet" href="static/css/styles.css">
+</head>
+<body>
+  <h1>GLAD YOU ARE BACK</h1>
+
+  <!-- Add Item Form -->
+  <div class="container">
+  <section id="add-item-section">
+    <h2>Add New Item</h2>
+    <form id="add-item-form">
+      <label for="name">Item Name:</label>
+      <input type="text" id="name" name="name" required>
+
+      <label for="category">Category:</label>
+      <input type="text" id="category" name="category" required>
+
+      <label for="serialNumber">Serial Number:</label>
+      <input type="text" id="serialNumber" name="serialNumber" placeholder="S/N not applicable">
+
+      <label>
+        <input type="checkbox" id="sn-not-applicable"> S/N not applicable
+      </label>
+
+      <label for="quantity">Quantity:</label>
+      <input type="number" id="quantity" name="quantity" required>
+
+      <label for="purchaseDate">Purchase Date:</label>
+      <input type="date" id="purchaseDate" name="purchaseDate" required>
+
+      <label for="condition">Condition:</label>
+      <select id="condition" name="condition">
+        <option value="new">New</option>
+        <option value="used">Used</option>
+        <option value="refurbished">Refurbished</option>
+      </select>
+    <!-- Existing fields -->
+    <label for="buyingPrice">Buying Price</label>
+  <input type="number" id="buyingPrice" name="buyingPrice" required>
+
+  <label for="sellingPrice">Selling Price</label>
+  <input type="number" id="sellingPrice" name="sellingPrice" required>
+  
+    <label for="maxDiscount">Max Discount</label>
+    <input type="number" id="maxDiscount" />
+
+  <label for="isDiscounted">Discounted:</label>
+  <select id="isDiscounted" name="isDiscounted">
+    <option value="false">No</option>
+    <option value="true">Yes</option>
+  </select>
+
+      <button type="submit">Add Item</button>
+    </form>
+  </section>
+  </div>
+  
+  <div class="container">
+    <h2>Add Faulty Item</h2>
+    <form id="faultyItemForm">
+      <label for="faulty-name">Item Name:</label>
+<input type="text" id="faulty-name" required>
+
+<label for="faulty-quantity">Quantity:</label>
+<input type="number" id="faulty-quantity" required>
+
+  
+      <label for="reason">Reason:</label>
+      <input type="text" id="reason" required>
+      
+      <button type="submit">Submit</button>
+      <p id="formMessage"></p>
+      <button type="button" onclick="window.location.href='dash.html'">Dashboard</button>
+
+    </form>
+  </div>
+  
+
+  <script src="static/js/app.js"></script>
+</body>
+</html>

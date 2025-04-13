@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inventory Tracker</title>
+  <link rel="stylesheet" href="static/css/inventory-view.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+  <button type="button" onclick="window.location.href='dash.html'">Dashboard</button>
+
+
+  <section id="inventory-items">
+    <h2>Inventory Items</h2>
+    
+    <!-- Filter and Search Section -->
+    <div style="margin-bottom: 20px; display: flex; justify-content: space-between;">
+      <div>
+        <label for="statusFilter">Filter by Status:</label>
+        <select id="statusFilter" onchange="applyFiltersAndSorting()">
+          <option value="">All</option>
+          <option value="New">New</option>
+          <option value="Old">Old</option>
+        </select>
+      </div>
+      <div>
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Search by item name"
+          oninput="applyFiltersAndSorting()"
+          style="padding: 8px; width: 200px; margin-right: 40%;"
+          
+        />
+      </div>
+    </div>
+  
+    <!-- Inventory Table -->
+    <div class="table-container">
+      <table id="itemsTable">
+        <thead>
+          <tr>
+            <th onclick="sortTable('name')", style="cursor: pointer;">Item Name &#x25B2;&#x25BC;</th>
+            <th onclick="sortTable('quantity')", style="cursor: pointer;">Quantity &#x25B2;&#x25BC;</th>
+            <th onclick="sortTable('status')", style="cursor: pointer;">Status &#x25B2;&#x25BC;</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="itemsTableBody">
+          <!-- Items will be dynamically displayed -->
+        </tbody>
+      </table>
+    </div>
+  
+    <!-- Pagination Controls -->
+    <div id="pagination" style="margin-top: 20px; text-align: center;">
+      <!-- Pagination buttons will be dynamically added -->
+    </div>
+    <button id="export-items-btn">Export to Excel</button>
+  </section>
+  
+     <section id="sold-items-section">
+        <h2>Sold Items</h2>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Serial Number</th>
+                <th>Item Name &#x25B2;&#x25BC;</th>
+                <th>Category &#x25B2;&#x25BC;</th>
+                <th>Quantity</th>
+                <th>Date Sold</th>
+                <th>Price</th>
+                <th>Discounted</th>
+                <th>Payment Method</th> <!-- New column for Payment Method -->
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="soldItemsTableBody"></tbody>
+          </table>
+        </div>
+ <div id="sold-items-pagination">
+        <button id="sold-prev-btn">Previous</button>
+        <span id="sold-page-number">Page 1</span>
+        <button id="sold-next-btn">Next</button>
+    </div>
+        <button id="export-sold-btn">Export to Excel</button>
+      </section>
+      
+        
+      
+    <section>     
+       <table id="faultyItemsTable">
+        <thead>
+            <tr>
+              <th>Name &#x25B2;&#x25BC;</th>
+                <th>Quantity</th>
+                <th>Reason</th>
+                <th>Added On</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <div id="faulty-items-pagination">
+      <button id="faulty-prev-btn">Previous</button>
+      <span id="faulty-page-number">Page 1</span>
+      <button id="faulty-next-btn">Next</button>
+  </div>
+    <button id="export-Faulty-btn">Export to Excel</button>
+  </section>
+
+
+      <script>
+
+        // Handle selling an item with a styled form
+        async function sellItem(itemId) {
+  const formHtml = `
+    <style>
+     /* Form Container Styling */
+#sellForm {
+  background-color: rgba(0, 0, 0, 0.8);
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 0 25px rgba(0, 140, 255, 0.7);
+  max-width: 400px;
+  margin: 20px auto;
+  font-family: 'Arial', sans-serif;
+  color: #fff;
+  transition: all 0.3s ease;
+}
+
+/* Form Title Styling */
+#sellForm h2 {
+  color: #00e6ff;
+  font-size: 2em;
+  text-align: center;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  animation: glow 1.5s infinite alternate;
+}
+
+/* Glow Animation for H2 */
+@keyframes glow {
+  0% {
+    text-shadow: 0 0 10px #00e6ff, 0 0 20px #00e6ff, 0 0 30px #00e6ff, 0 0 40px #00e6ff;
+  }
+  100% {
+    text-shadow: 0 0 20px #00e6ff, 0 0 30px #00e6ff, 0 0 40px #00e6ff, 0 0 50px #00e6ff;
+  }
+}
+
+/* Label Styling */
+#sellForm label {
+  display: block;
+  color: #00e6ff;
+  margin-top: 15px;
+  font-size: 1.1em;
+  text-shadow: 0 0 5px #00e6ff, 0 0 10px #00e6ff;
+}
+
+/* Input Fields Styling */
+#sellForm input, 
+#sellForm select {
+  width: 100%;
+  padding: 12px;
+  margin-top: 8px;
+  border: 2px solid #008cff;
+  border-radius: 10px;
+  background-color: #222;
+  color: #fff;
+  font-size: 1em;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+}
+
+#sellForm input:focus, 
+#sellForm select:focus {
+  border-color: #00e6ff;
+  outline: none;
+  box-shadow: 0 0 8px rgba(0, 140, 255, 0.6);
+}
+
+/* Placeholder Text Styling */
+#sellForm input::placeholder {
+  color: #ccc;
+}
+
+/* Submit Button Styling */
+#sellForm button {
+  background-color: #00e6ff;
+  color: #fff;
+  border: 2px solid #008cff;
+  padding: 12px 20px;
+  font-size: 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.3s ease;
+  margin-top: 20px;
+}
+
+#sellForm button:hover {
+  background-color: #008cff;
+  box-shadow: 0 0 15px rgba(0, 140, 255, 0.8);
+  transform: scale(1.05);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  #sellForm {
+    width: 90%;
+  }
+}
+
+    </style>
+    <form id="sellForm">
+      <label for="quantity">Quantity to Sell</label>
+      <input type="number" id="quantity" placeholder="Enter quantity" required />
+      
+      <label for="soldPrice">Selling Price</label>
+      <input type="number" id="soldPrice" placeholder="Enter price" required />
+      
+      <label for="discount">Discount</label>
+      <input type="number" id="discount" placeholder="Optional discount" />
+      
+      <label for="paymentMethod">Payment Method</label>
+      <select id="paymentMethod" required>
+        <option value="" disabled selected>Select payment method</option>
+        <option value="cash">Cash</option>
+        <option value="paybill">Paybill</option>
+      </select>
+    </form>
+  `;
+
+  const sellData = await Swal.fire({
+    title: "Enter Sale Details",
+    html: formHtml,
+    focusConfirm: false,
+    showCancelButton: true,
+    confirmButtonText: "Sell",
+    preConfirm: () => {
+      const quantity = parseInt(document.getElementById("quantity").value, 10);
+      const soldPrice = parseFloat(document.getElementById("soldPrice").value);
+      const discount = parseFloat(document.getElementById("discount").value);
+      const paymentMethod = document.getElementById("paymentMethod").value;
+
+      if (quantity <= 0 || soldPrice <= 0 || !paymentMethod) {
+        Swal.showValidationMessage("Please enter valid quantity, price, and payment method.");
+        return false;
+      }
+
+      return { quantity, soldPrice, discount: isNaN(discount) ? 0 : discount, paymentMethod };
+    },
+  });
+
+  if (sellData.isConfirmed) {
+    const { quantity, soldPrice, discount, paymentMethod } = sellData.value;
+
+    try {
+      const response = await fetch("http://localhost:3000/api/sell-item", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ itemId, quantity, soldPrice, discount, paymentMethod }),
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        Swal.fire("Success!", result.message, "success");
+        loadItems(); // Reload items list
+      } else {
+        Swal.fire("Error", result.error || "Failed to sell item.", "error");
+      }
+    } catch (error) {
+      console.error("Error selling item:", error);
+      Swal.fire("Error", "Failed to sell item.", "error");
+    }
+  }
+}
+
+
+
+ // Load sold items
+async function loadSoldItems() {
+  try {
+    const tableBody = document.getElementById("soldItemsTableBody");
+    if (!tableBody) {
+      console.error("Element with id 'soldItemsTableBody' not found in the DOM.");
+      return; // Stop execution if the element is not found
+    }
+
+    const response = await fetch("http://localhost:3000/api/sold-items");
+    if (!response.ok) {
+      throw new Error("Failed to fetch sold items.");
+    }
+
+    const soldItems = await response.json();
+    tableBody.innerHTML = ""; // Clear the table before populating
+
+    soldItems.forEach((soldItem) => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${soldItem._id}</td>
+        <td>${soldItem.serialNumber || "N/A"}</td>
+        <td>${soldItem.name}</td>
+        <td>${soldItem.category}</td>
+        <td>${soldItem.quantity}</td>
+        <td>${new Date(soldItem.dateSold).toLocaleDateString()}</td>
+        <td>${soldItem.soldPrice.toFixed(2)}</td>
+        <td>${soldItem.discountApplied ? soldItem.discountApplied.toFixed(2) : "None"}</td>
+        <td>${soldItem.paymentMethod || "N/A"}</td> <!-- Payment method added -->
+        <td>${soldItem.isDiscounted ? "Discounted" : "Original Price"}</td>
+      `;
+      tableBody.appendChild(row);
+    });
+  } catch (error) {
+    console.error("Error loading sold items:", error);
+  }
+}
+
+
+
+let originalItems = []; // Cache for all items
+let currentPage = 1;    // Keep track of the current page
+let currentSort = { key: null, order: 1 }; // Default sorting (ascending)
+
+// Fetch items and cache the data
+async function loadItems(page = 1) {
+  currentPage = page; // Update the current page
+  try {
+    const response = await fetch(`http://localhost:3000/api/get-items?page=${page}&limit=50`);
+    const data = await response.json();
+    const { items, totalPages } = data;
+
+    originalItems = items; // Cache the original items
+    renderTable(items);
+    setupPagination(totalPages, page);
+  } catch (error) {
+    console.error("Error loading items:", error);
+    alert("Error fetching inventory items.");
+  }
+}
+
+// Render table based on filters and sorting
+function renderTable(items) {
+  const tableBody = document.getElementById("itemsTableBody");
+  tableBody.innerHTML = ""; // Clear existing content
+
+  if (!items.length) {
+    tableBody.innerHTML = "<tr><td colspan='4'>No matching items found.</td></tr>";
+    return;
+  }
+
+  items.forEach((item) => {
+    const isNew = new Date(item.purchaseDate) >= new Date(new Date().setDate(new Date().getDate() - 30));
+    const status = isNew ? "New" : "Old";
+
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${item.name}</td>
+      <td>${item.quantity || 0}</td>
+      <td>${status}</td>
+      <td><button onclick="sellItem('${item._id}')">Sell</button></td>
+    `;
+    tableBody.appendChild(row);
+  });
+}
+
+// Filter and sort items
+function applyFiltersAndSorting() {
+  let filteredItems = [...originalItems];
+
+  // Apply search filter
+  const searchQuery = document.getElementById("searchInput").value.toLowerCase();
+  if (searchQuery) {
+    filteredItems = filteredItems.filter(item =>
+      item.name.toLowerCase().includes(searchQuery)
+    );
+  }
+
+  // Apply status filter
+  const statusFilter = document.getElementById("statusFilter").value;
+  if (statusFilter) {
+    filteredItems = filteredItems.filter(item => {
+      const isNew = new Date(item.purchaseDate) >= new Date(new Date().setDate(new Date().getDate() - 30));
+      const status = isNew ? "New" : "Old";
+      return status === statusFilter;
+    });
+  }
+
+  // Apply sorting
+  if (currentSort.key) {
+    filteredItems.sort((a, b) => {
+      const aValue = a[currentSort.key];
+      const bValue = b[currentSort.key];
+      if (typeof aValue === "string") return currentSort.order * aValue.localeCompare(bValue);
+      return currentSort.order * (aValue - bValue);
+    });
+  }
+
+  renderTable(filteredItems);
+}
+
+// Sort table by a specific key
+function sortTable(key) {
+  if (currentSort.key === key) {
+    currentSort.order *= -1; // Toggle sort order
+  } else {
+    currentSort.key = key;
+    currentSort.order = 1; // Default to ascending
+  }
+  applyFiltersAndSorting();
+}
+
+// Set up pagination
+function setupPagination(totalPages, currentPage) {
+  const pagination = document.getElementById("pagination");
+  pagination.innerHTML = "";
+
+  for (let i = 1; i <= totalPages; i++) {
+    const button = document.createElement("button");
+    button.textContent = i;
+    button.className = "pagination-btn";
+    if (i === currentPage) button.classList.add("active");
+    button.onclick = () => loadItems(i);
+    pagination.appendChild(button);
+  }
+}
+
+
+
+// Export table data to Excel
+function exportToExcel(tableSelector, fileName) {
+  const table = document.querySelector(tableSelector);
+  const worksheet = XLSX.utils.table_to_sheet(table);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+  XLSX.writeFile(workbook, fileName);
+}
+// Event listeners for export buttons
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById('export-sold-btn').addEventListener('click', () => exportToExcel('#soldItemsTableBody', 'Sold_items.xlsx'));
+  document.getElementById('export-items-btn').addEventListener('click', () => exportToExcel('#itemsTableBody', 'inventory_items.xlsx'));
+  document.getElementById('export-Faulty-btn').addEventListener('click', () => exportToExcel('#itemsTableBody', 'Faulty_items.xlsx'));
+});
+
+async function loadFaultyItems() {
+        const tableBody = document.querySelector('#faultyItemsTable tbody');
+
+        try {
+            const response = await fetch('http://localhost:3000/api/faulty-items');
+            const data = await response.json();
+
+            // Clear existing rows
+            tableBody.innerHTML = '';
+
+            // Check if data exists
+            if (data.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="4">No faulty items found.</td></tr>`;
+                return;
+            }
+
+            // Populate table with data
+            data.forEach(item => {
+                const row = `
+                  <tr>
+                    <td>${item.name}</td>
+                    <td>${item.quantity}</td>
+                    <td>${item.reason}</td>
+                    <td>${new Date(item.createdAt).toLocaleDateString()}</td>
+                  </tr>`;
+                tableBody.innerHTML += row;
+            });
+        } catch (error) {
+            console.error('Error fetching faulty items:', error);
+            tableBody.innerHTML = `<tr><td colspan="4">Failed to load items.</td></tr>`;
+        }
+    }
+
+document.addEventListener("DOMContentLoaded", () => {
+// Initialize data fetching on page load
+window.onload = () => {
+  loadItems(1);
+  loadSoldItems();
+  loadFaultyItems();
+};
+});
+
+
+</script>
+
+</body>
+</html>      
