@@ -36,16 +36,9 @@ app.get("/", (req, res) => {
 
 
 });
-const bindingPath = path.join(__dirname, 'bcrypt_lib.node');
+const hash = bcrypt.hashSync(password, 10);
+const isMatch = bcrypt.compareSync(password, hash);
 
-if (fs.existsSync(bindingPath)) {
-  // Dynamically load bcrypt's native module
-  const binding = require(bindingPath);
-  bcrypt.nativeBinding = binding;
-} else {
-  console.error('bcrypt_lib.node not found. Ensure it is included in the build.');
-  process.exit(1);
-}
 
 
 const { router: registerRoutes} = require("./routes/Register");
