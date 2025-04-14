@@ -8,6 +8,7 @@ const path = require('path');
 const jwt = require("jsonwebtoken");
 const bcrypt = require('bcryptjs');
 const fs = require('fs');
+require('dotenv').config();
 
 
 
@@ -21,21 +22,15 @@ app.use(express.Router());
 
 // Set up the MongoDB connection
 // Connect to MongoDB
-mongoose
-  .connect("mongodb://127.0.0.1:27017/inventoryDB", {
-  
-  })
-  .then(async () => {
-    console.log("Connected to MongoDB");
-  })
-  .catch((error) => console.error("Error connecting to MongoDB:", error));
+const mongoose = require('mongoose');
 
-// Routes (Example route to confirm server is running)
-app.get("/", (req, res) => {
-  res.send("Server is running.");
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
+.then(() => console.log("✅ Connected to MongoDB Atlas"))
+.catch((error) => console.error("❌ Error connecting to MongoDB Atlas:", error));
 
-
-});
 
 const { router: registerRoutes} = require("./routes/Register");
 const faultyItemRoutes = require('./routes/FaultyItems');
