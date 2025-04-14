@@ -604,26 +604,25 @@ p{
     width: 90% !important;
   }
 }
+/* Hamburger Button Styling */
 .hamburger-btn {
-  display: none;
-  flex-direction: column;
-  justify-content: space-between;
-  width: 35px;
-  height: 30px;
-  cursor: pointer;
   position: fixed;
   top: 20px;
   left: 20px;
-  z-index: 1000;
+  z-index: 9999;
+  cursor: pointer;
+  display: none; /* Hidden by default on large screens */
 }
 
-.bar {
-  height: 4px;
-  background-color: #00f7ff;
-  border-radius: 2px;
-  transition: 0.4s;
-  box-shadow: 0 0 10px #00f7ff;
+.hamburger-btn .bar {
+  display: block;
+  width: 25px;
+  height: 3px;
+  margin: 5px auto;
+  background-color: #333;
+  transition: all 0.3s ease-in-out;
 }
+
 
 .bar.top, .bar.middle, .bar.bottom {
   width: 100%;
@@ -640,6 +639,13 @@ p{
 
 .hamburger-btn.active .bottom {
   transform: rotate(-45deg) translateY(-10px);
+}
+
+/* Show hamburger on small screens */
+@media (max-width: 768px) {
+  .hamburger-btn {
+    display: block;
+  }
 }
 
 /* Sidebar + Responsive */
