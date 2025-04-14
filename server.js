@@ -36,10 +36,6 @@ app.get("/", (req, res) => {
 
 
 });
-const hash = bcrypt.hashSync(password, 10);
-const isMatch = bcrypt.compareSync(password, hash);
-
-
 
 const { router: registerRoutes} = require("./routes/Register");
 const faultyItemRoutes = require('./routes/FaultyItems');
