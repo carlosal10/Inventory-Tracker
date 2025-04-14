@@ -644,9 +644,14 @@ p{
 
 /* Sidebar + Responsive */
 @media (max-width: 768px) {
-  .hamburger-btn {
-    display: flex;
+  #sidebar {
+    transform: translateX(-100%);
   }
+
+  #sidebar.open {
+    transform: translateX(0);
+  }
+
 
   #sidebar {
     position: fixed;
