@@ -524,3 +524,83 @@ p{
 .close-btn:hover {
   color: #000;
 }
+
+@media (max-width: 768px) {
+  #sidebar {
+    position: fixed;
+    width: 100%;
+    height: auto;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    padding: 15px;
+    display: none; /* Toggle via JS if needed */
+  }
+
+  #main-content {
+    margin-left: 0;
+    padding: 20px;
+  }
+
+  #sidebar ul {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  #sidebar ul li {
+    margin: 10px 0;
+  }
+
+  #sidebar h2 {
+    font-size: 1.5em;
+  }
+}
+@media (max-width: 768px) {
+  #search-section {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  #searchInput {
+    width: 90%;
+    margin-bottom: 10px;
+  }
+
+  button {
+    width: 90%;
+  }
+}
+@media (max-width: 768px) {
+  .metric {
+    width: 90%;
+    margin: 10px auto;
+  }
+
+  canvas {
+    height: 300px !important;
+    width: 100% !important;
+  }
+}
+@media (max-width: 768px) {
+  #searchResultsTable {
+    display: block;
+    overflow-x: auto;
+    width: 100%;
+  }
+}
+@media (max-width: 768px) {
+  .notification-alert {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .notification-alert button {
+    margin-top: 10px;
+    width: 100%;
+  }
+
+  #restock-btn, #restock-quantity {
+    width: 90% !important;
+  }
+}
