@@ -6,7 +6,7 @@ const Item = require("./models/Item");
 const SoldItem = require("./models/SoldItem");
 const path = require('path');
 const jwt = require("jsonwebtoken");
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const fs = require('fs');
 
 
