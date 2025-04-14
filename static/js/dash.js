@@ -518,6 +518,13 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
+const hamburgerBtn = document.getElementById('hamburger-btn');
+const sidebar = document.getElementById('sidebar');
+
+hamburgerBtn.addEventListener('click', () => {
+  sidebar.classList.toggle('collapsed');
+  hamburgerBtn.classList.toggle('active');
+});
 
 
 
