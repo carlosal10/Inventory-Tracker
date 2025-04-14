@@ -527,7 +527,6 @@ hamburgerBtn.addEventListener('click', () => {
 });
 
 
-
 document.addEventListener("DOMContentLoaded", () => {
 // Initialize data fetching on page load
 window.onload = () => {
