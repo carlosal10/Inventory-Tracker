@@ -9,7 +9,7 @@ async function fetchDashboardData() {
     const loader = document.getElementById('loader');
     loader.style.display = 'block';
 
-    const response = await fetch('http://localhost:3000/api/dashboard');
+    const response = await fetch('/api/dashboard');
     const data = await response.json();
 
     // Hide loading spinner once data is fetched
@@ -103,7 +103,7 @@ function renderProductAnalysisChart(productData = []) {
 // Fetch and render sales trend data
 async function fetchSalesTrend() {
   try {
-    const response = await fetch('http://localhost:3000/api/sales-trends?period=30');
+    const response = await fetch('/api/sales-trends?period=30');
     if (!response.ok) throw new Error("Failed to fetch sales trend data.");
     const data = await response.json();
     
@@ -123,7 +123,7 @@ async function fetchSalesTrend() {
 // Fetch and render top products data
 async function fetchTopProducts() {
   try {
-    const response = await fetch('http://localhost:3000/api/top-products');
+    const response = await fetch('/api/top-products');
     if (!response.ok) throw new Error("Failed to fetch top products data.");
     const data = await response.json();
     
@@ -321,7 +321,7 @@ function aggregateTopProductsByCategory(products) {
       const { quantity, soldPrice, discount, paymentMethod } = sellData.value;
   
       try {
-        const response = await fetch("http://localhost:3000/api/sell-item", {
+        const response = await fetch("/api/sell-item", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ itemId, quantity, soldPrice, discount, paymentMethod }),
@@ -344,7 +344,7 @@ function aggregateTopProductsByCategory(products) {
   
   async function fetchNotifications() {
     try {
-      const response = await fetch("http://localhost:3000/api/notifications");
+      const response = await fetch("/api/notifications");
       const data = await response.json();
       console.log("Notification Data:", data);  // Debugging log
   
@@ -467,7 +467,7 @@ async function searchItems() {
   }
 
   try {
-    const response = await fetch(`http://localhost:3000/api/search-items?query=${encodeURIComponent(query)}`);
+    const response = await fetch(`/api/search-items?query=${encodeURIComponent(query)}`);
     const results = await response.json();
     displaySearchResults(results);
   } catch (error) {

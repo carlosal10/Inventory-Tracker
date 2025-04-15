@@ -59,7 +59,7 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
       // Send a POST request to your API to add the item
-      fetch('http://localhost:3000/api/add-item', {
+      fetch('/api/add-item', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -90,7 +90,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const formMessage = document.getElementById('formMessage');
   
         try {
-          const response = await fetch('http://localhost:3000/api/faulty-items', {
+          const response = await fetch('/api/faulty-items', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name, quantity, reason })
